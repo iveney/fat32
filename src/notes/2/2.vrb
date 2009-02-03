@@ -1,0 +1,7 @@
+\frametitle {Sample work flow}
+  \begin{figure}[!ht]
+  \centering
+    \includegraphics[height=0.8\textheight]{read.pdf}
+    \caption{Sample work flow}
+    \label{fig:read}
+  \end{figure}

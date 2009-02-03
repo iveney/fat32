@@ -1,0 +1,647 @@
+\documentclass[notheorems,mathserif,table]{beamer}
+\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{graphicx}
+\useoutertheme[height=0.11\textwidth,width=0.15\textwidth,hideothersubsections]{sidebar}
+\usecolortheme{whale}      % Outer color themes, 其他选择: whale, seahorse, dolphin . 换一个编译看看有什么不同.
+\usecolortheme{orchid}     % Inner color themes, 其他选择: lily, orchid
+\useinnertheme[shadow]{rounded} % 对 box 的设置: 圆角、有阴影.
+
+%\setbeamercolor{background canvas}{bg=blue!9} % 背景色, 9%的蓝色. 去掉下一行, 试一试这个.
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!25] %%背景色, 上25%的蓝, 过渡到下白.
+\usefonttheme{serif}  % 字体. 个人偏好有轮廓的字体. 去掉这个设置编译, 就看到不同了.
+\setbeamertemplate{navigation symbols}{\insertframenumber  / \inserttotalframenumber ~~}   %% 去掉页面下方默认的导航条.
+%\setbeamertemplate{footline}[page number]
+\setbeamercolor{sidebar}{bg=blue!30} % sidebar的颜色, 50%的蓝色.
+\setbeamercolor{logo}{bg=blue!50}   % logo的颜色
+%%------------------------常用宏包---------------------------------------------------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+
+\usepackage{subfigure} %%图形或表格并排排列
+\usepackage{xmpmulti}  %%支持文中的 \multiinclude 等命令, 使 mp 文件逐帧出现. 具体讨论见 beamer 手册.
+\usepackage{colortbl,dcolumn}     %% 彩色表格
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+\DeclareGraphicsRule{*}{mps}{*}{} %% 使 pdflatex 可以纳入 metapost 做的图片.
+
+\logo{\includegraphics[height=0.09\textwidth]{logo.pdf}}%% 校徽
+
+\renewcommand{\raggedright}{\leftskip=0pt \rightskip=0pt plus 0cm}
+\raggedright %% 中文对齐
+
+\def\hilite<#1>{\temporal<#1>{\color{blue!35}}{\color{magenta}}{\color{blue!75}}}
+%% 自定义命令, 源自 beamer_guide. item 逐步显示时, 使已经出现的item、正在显示的item、将要出现的item 呈现不同颜色.
+
+\newcolumntype{H}{>{\columncolor{blue!20}}c!{\vrule}}
+\newcolumntype{H}{>{\columncolor{blue!20}}c}  %% 表格设置
+%==================================参考文献==============================================================
+\newcommand{\upcite}[1]{\textsuperscript{\cite{#1}}}  %自定义命令\upcite, 使参考文献引用以上标出现
+\bibliographystyle{plain}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%重定义字体、字号命令 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\sihao}{\fontsize{14pt}{\baselineskip}\selectfont}      % 字号设置
+\newcommand{\xiaosihao}{\fontsize{12pt}{\baselineskip}\selectfont}  % 字号设置
+\newcommand{\wuhao}{\fontsize{10.5pt}{\baselineskip}\selectfont}    % 字号设置
+\newcommand{\xiaowuhao}{\fontsize{9pt}{\baselineskip}\selectfont}   % 字号设置
+\newcommand{\liuhao}{\fontsize{7.875pt}{\baselineskip}\selectfont}  % 字号设置
+\newcommand{\qihao}{\fontsize{5.25pt}{\baselineskip}\selectfont}    % 字号设置
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\CSE}{\href{http://www.cse.cuhk.edu.hk}{Department of Computer Science and Engineering}}
+\newcommand{\CUHK}{\href{http://www.cuhk.edu.hk}{The Chinese University of Hong Kong}}
+\newcommand{\mymail}{\href{mailto:zgxiao@cse.cuhk.edu.hk}{\textcolor{blue}{\underline{zgxiao@cse.cuhk.edu.hk}}}}
+\newcommand{\myname}{XIAO Zigang}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{CSC/CEG 3150 Tutorial}
+\subtitle{Introduction to FAT32 and Assignment 3}
+\author[ ]{\myname\\\mymail}
+\institute{\wuhao \textcolor{black}{\CSE\\\CUHK}}
+\date{\today}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lstset{% general command to set parameter(s)
+        language=C,                     % C language synthx
+        morekeywords={cout, using, _complex},   % add keywords
+        keywordstyle=\color{blue},      % 关键词着色
+        commentstyle=\color{violet},     % black comments
+        captionpos=b,
+        frame=single,
+        stringstyle=\color{gray},                % typewriter type for strings
+        basicstyle=\tiny,               % print whole listing tiny
+        identifierstyle=,               % nothing happens
+        tabsize=4,                      % 制表符的空格数
+        stepnumber=1,
+        numbersep=5pt,
+        keepspaces=true,                % 保留空格
+        showspaces=false,               % 是否显示空格为一朝上的小方框
+        showstringspaces=false,         % 是否显示字符串中的空格为一朝上的小方框
+        escapeinside={/*@}{@*/}         % 用/*@label@*/标示指定代码行，
+                                        % 可以用\ref{label}引用
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\frame{\titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Outline
+\section[Outline]{Outline}
+\frame{\frametitle{Outline}\tableofcontents}
+
+\begin{comment}
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[current,currentsubsection]
+  \end{frame}
+}
+\end{comment}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{FAT32}
+\subsection{Ideas}
+\begin{frame}
+\frametitle{Sectors}
+\begin{itemize}
+  \item Basic unit of physical disk access
+  \item Usually 512 bytes for magnetic disk
+  \item Usually 2048 bytes for optical disk
+  \item The size is NOT fixed in Assignment 3
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{How are files stored in the disks?}
+\begin{itemize}
+  \item File size various
+  \item Recall what we learned from Assignment 2
+  \begin{itemize}
+    \item Like memory, hard disk can also be viewed as a flat space, using (logical) sector address(no longer C/H/S)
+    \item We use some simple data structure to manage the data
+  \end{itemize}
+  \item Actually the idea is similar
+  \item We may also use naive management strategy, e.g.
+  \begin{itemize}
+    \item File stores in contiguous sectors
+    \item All files store in the same directory(i.e. no directory)
+    \item A header per file, stores some meta-info, e.g. file size
+    \item We group all the headers together like a database so as to locate the file (linear search)
+  \end{itemize}
+  \item This really can make a file system,but...
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Further consideration}
+\begin{itemize}
+  \item Defect
+    \begin{itemize}
+    \item When appending data to a file, we must reallocate space - Disk I/O is very slow!
+    \item When files are deleted, fragments are made, we must defragement the disk often
+    \item When the number of files is large, it takes too long to do the search
+    \end{itemize}
+  \item Solution
+  \begin{itemize}
+    \item Allow files to store non-consecutive
+    \item \textbf{Directory tree} is more convenient to group data into a hierarchical manner
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Clusters and FAT}
+\begin{itemize}
+  \item Cluster is basic (logical) unit in FAT32
+  \item File and directory content is stored in clusters
+  \item A file occupies several clusters, rather than sectors. There is \textbf{time-space trade off}
+  \item If the size of a file exceeds one cluster,
+  use a \textbf{linked list} to find next block(cluster),
+  which will form a \textbf{cluster chain}
+  \item Note that the \textbf{cluster index starts from 2}
+\end{itemize}
+\end{frame}
+
+\subsection{FAT}
+\begin{frame}[fragile]
+\frametitle{FAT}
+\begin{itemize}
+  \item The FAT located in FAT area is used for such purpose, like a static linked list.
+  \item The basic idea of FAT is to use \textbf{File~Allocation~Table} to keep track of the file allocation status
+  \item Each entry A in FAT points to another FAT entry B,
+  which means the Cluster A is occupied by this file, and its next cluster is Cluster B
+  \item Use a reserved number EOC to denote \textbf{End~Of~Cluster} (think of NULL)
+\end{itemize}
+\centering
+    \rowcolors[]{1}{blue!20}{blue!10}
+    \begin{tabular}{ l | l }
+    Description & value \\
+    \hline
+    Unallocated & {\tt 0x?0000000}\footnote{`?' means upper 4 bits are usually zero but are reserved and should be left untouched}\\
+    Allocated   & {\tt 0x?0000002$\sim$0x?FFFFFEF}\\
+    EOC         & {\tt 0x?FFFFFF8$\sim$0x?FFFFFFF}\\
+     \end{tabular}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Cluster chain}
+  \begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.7\textwidth]{ClusterChain.pdf}
+    \caption{Cluster chain}
+    \label{fig:ClusterChain}
+  \end{figure}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Layout}
+\begin{frame}
+\frametitle{FAT32 File System Layout}
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=\textwidth]{FAT32-crop.pdf}
+\caption{FAT32 file system overview}
+\label{fig:FAT32}
+\end{figure}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Areas}
+\begin{frame}
+\frametitle{Three Important Areas in FAT32}
+\begin{itemize}
+  \item Reserved Area
+  \begin{itemize}
+    \item First several sectors(usually 32) reserved for special use
+    \item The first sector (sector 0) is the \textbf{boot sector}
+    \begin{itemize}
+      \item Contains important information about the file system\\
+        {\small E.g. number of bytes per sector, number of sectors per cluster}
+      \item Contains the boot code (if necessary)\\
+        {\small Pointed by an assembly jump instruction in the first 3 bytes of sector 0}
+    \end{itemize}
+  \end{itemize}
+  \item FAT Area
+  \begin{itemize}
+    \item Contains a number of File Allocation Tables (FATs), usually 2 (it is not fixed,though)
+    \item Located just after the reserved area
+  \end{itemize}
+  \item Data Area
+  \begin{itemize}
+    \item Contains the root directory
+    \item Contains files / directories
+    \item Located just after the last FAT
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Boot Sector and DOS Boot Record}
+\begin{itemize}
+  \item Boot Sector is the first sector, i.e. sector 0
+  \item DBR(DOS Boot Record) is 0-512B in Boot Sector
+  \begin{itemize}
+    \item[-] Contains IMPORTANT information of the file system
+  \end{itemize}
+  \item The data structure is predefined
+  \begin{itemize}
+    \item[-] Declare a such data structure in your program
+    \begin{itemize}
+      \item[-] Be careful of the byte alignment in struct
+    \end{itemize}
+    \item[-] Read and memcpy the boot sector into your data structure
+    \item[-] You can now extract useful information from your data structure
+  \end{itemize}
+\end{itemize}
+{\tt
+\begin{lstlisting}[caption={Boot Record example},
+                    frame=single,
+                    stringstyle=\color{black},
+                   label=bootentrysample]
+0000000: eb3c 906d 6b64 6f73 6673 0000 0204 0100  .<.mkdosfs......
+0000010: 0200 0200 a0f8 2800 2000 4000 0000 0000  ......(. .@.....
+......
+00001f0: 0000 0000 0000 0000 0000 0000 0000 55aa  ..............U.
+
+OEM NAME = mkdosfs
+bytes per sector = 0x0200 = 512
+sector per cluster  = 0x04 = 4
+\end{lstlisting}
+}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{BootEntry}
+\begin{frame}[fragile]
+\frametitle{0 - 35 Bytes in Boot Sector (FAT32)}
+{\tt
+\begin{lstlisting}[caption={Boot Entry 0 - 35 Bytes},
+                    frame=none,
+                   label=BE1]
+#pragma pack(push,1)    /* BYTE align in memory (no padding) */
+typedef struct BootEntry{
+    unsigned char BS_jmpBoot[3];    /* Assembly instruction to jump to
+                                    boot code */
+    unsigned char BS_OEMName[8];    /* OEM Name in ASCII */
+    unsigned short BPB_BytsPerSec;  /* Bytes per sector. Allowed values
+                                    include 512,1024, 2048, and 4096 */
+    unsigned char BPB_SecPerClus;   /* Sectors per cluster (data unit).
+                                    Allowed values are powers of 2, but the
+                                    cluster size must be 32KB or smaller */
+    unsigned short BPB_RsvdSecCnt;  /* Size in sectors of the reserved area */
+    unsigned char BPB_NumFATs;      /* Number of FATs */
+    unsigned short BPB_RootEntCnt;  /* Maximum number of files in the root
+                                    directory for  FAT12 and FAT16. This is
+                                    0 for FAT32 */
+    unsigned short BPB_TotSec16;    /* 16-bit value of number of sectors in
+                                    file system */
+    unsigned char BPB_Media;        /* Media type */
+    unsigned short BPB_FATSz16;     /* 16-bit size in sectors of each FAT
+                                    for FAT12 and  FAT16. For FAT32, this
+                                    field is 0 */
+    unsigned short BPB_SecPerTrk;   /* Sectors per track of storage device */
+    unsigned short BPB_NumHeads;    /* Number of heads in storage device */
+    unsigned long BPB_HiddSec;  /* Number of sectors before the start of partition */
+    unsigned long BPB_TotSec32; /* 32-bit value of number of sectors in file system.
+                    Either this value or the 16-bit value above must be  0 */
+
+\end{lstlisting}
+}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{36 - 89 Bytes in Boot Sector (FAT32)}
+{\tt
+\begin{lstlisting}[caption={Boot Entry 36 - 89 Bytes},
+                    frame=none,
+                   label=BE2]
+    unsigned long BPB_FATSz32;      /* 32-bit size in sectors of one FAT */
+    unsigned short BPB_ExtFlags;    /* A flag for FAT */
+    unsigned short BPB_FSVer;       /* The major and minor version number */
+    unsigned long BPB_RootClus;             /* Cluster where the root directory can
+                                    be found */
+    unsigned short BPB_FSInfo;      /* Sector where FSINFO structure can be
+                                    found */
+    unsigned short BPB_BkBootSec;   /* Sector where backup copy of boot
+                                    sector is located */
+    unsigned char BPB_Reserved[12]; /* Reserved */
+    unsigned char BS_DrvNum;        /* BIOS INT13h drive number */
+    unsigned char BS_Reserved1;     /* Not used */
+    unsigned char BS_BootSig;       /* Extended boot signature to identify
+                                    if the next three values are valid */
+    unsigned long BS_VolID;         /* Volume serial number */
+    unsigned char BS_VolLab[11];    /* Volume label in ASCII. User defines
+                                     when creating the file system */
+    unsigned char BS_FilSysType[8]; /* File system type label in ASCII */
+}BootEntry;
+#pragma pack(pop)                  /* BYTE align in memory (no padding)*/
+\end{lstlisting}
+}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Program Flow}
+\begin{frame}[fragile]
+\frametitle{Sample work flow}
+  \begin{figure}[!ht]
+  \centering
+    \includegraphics[width=\textwidth]{flow.pdf}
+    \caption{Sample work flow}
+    \label{fig:workflow}
+  \end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Read/Write Sector/Cluster}
+\begin{frame}[fragile]
+\frametitle{How to read data in terms of sectors?}
+{\tt
+\begin{lstlisting}[caption={read sector},
+                    frame=none,
+                   label=rs]
+/* go to the sector indicated by "sector_number",
+ * then read n contiguous sectors (n = num_sectors),
+ * and write the result into "buffer" */
+/* Remember to clear the buffer first */
+int read_sectors(int sector_number, unsigned char *buffer, int num_sectors)
+{
+        int dest, len;     /* used for error checking only */
+
+        dest = lseek(fid, sector_number*bps, SEEK_SET);
+        if(dest != sector_number*bps)
+        {
+                /* Error handling here */
+        }
+        if(bps*num_sectors > MAX)
+        {
+                /* Error handling here */
+        }
+        len = read(fid, buffer, bps*num_sectors);
+        if(len != bps*num_sectors)
+        {
+                /* Error handling here */
+        }
+        return len;
+}
+\end{lstlisting}
+}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{How to write data in terms of sectors?}
+{\tt
+\begin{lstlisting}[caption={write sector},
+                    frame=none,
+                   label=ws]
+/* go to the sector indicated by "sector_number",
+ * then write n contiguous sectors (n = num_sectors)
+ * with the contents in "buffer" */
+int write_sectors(int sector_number, unsigned char *buffer, int num_sectors)
+{
+        int dest, len;
+
+        dest = lseek(fid, sector_number*bps, SEEK_SET);
+        if (dest != sector_number*bps)
+        {
+                /* Error handling here */
+        }
+        len = write(fid, buffer, bps*num_sectors);
+        if(len != bps*num_sectors)
+        {
+                /* Error handling here */
+        }
+        return len;
+}
+\end{lstlisting}
+}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Relationship between Cluster and Sector}
+\begin{itemize}
+  \item cluster(C) to sector(S):
+  \begin{itemize}
+    \item (C-2) * (sector per cluster) + (sector of cluster 2)
+  \end{itemize}
+  \item sector(S) to cluster(C):
+  \begin{itemize}
+    \item (S - sector of cluster 2) / (sector per cluster) +2
+  \end{itemize}
+  \item sector of cluster 2 = ?
+  \begin{itemize}
+    \item starting sector of data area
+  \end{itemize}
+\end{itemize}
+\begin{figure}
+\includegraphics[width=0.7\textwidth]{spc.pdf}
+\caption{Example:sector per cluster = 4}
+\end{figure}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{DirEntry}
+\begin{frame}
+\frametitle{Directory in FAT32}
+\begin{itemize}
+  \item In FAT32, directory is like a normal file
+  \item Its contents are information of the files in it
+  \begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.5\textwidth]{DirectoryEntry.pdf}
+    \caption{Directory entry}
+    \label{fig:DirectoryEntry}
+  \end{figure}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{C struct of Directory Entry}
+{\tt
+\begin{lstlisting}[caption={DirEntry struct},
+                    frame=single,
+                   label=src:DirEntry]
+#pragma pack(push,1)
+struct DirEntry
+{
+    /* Unallocated if first character is 0xe5 or 0x00 */
+    unsigned char DIR_Name[11] ;      /* File name in 3.8 format */
+    unsigned char DIR_Attr ;          /* File attributes */
+    unsigned char DIR_NTRes ;         /* Reserved */
+    unsigned char DIR_CrtTimeTenth ;  /* Created time */
+    unsigned short DIR_CrtTime ;      /* Created time */
+    unsigned short DIR_CrtDate ;      /* Created day */
+    unsigned short DIR_LstAccDate ;   /* Accessed day */
+    unsigned short DIR_FstClusHI ;    /* High 2 bytes of first cluster */
+    unsigned short DIR_WrtTime ;      /* Written time */
+    unsigned short DIR_WrtDate ;      /* Written day */
+    unsigned short DIR_FstClusLO ;    /* Low 2 bytes of first cluster*/
+    unsigned long DIR_FileSize ;      /* Size of file(0 for directories) */
+};
+#pragma pack(pop)
+\end{lstlisting}
+\begin{lstlisting}[caption={DirEntry example},
+                    frame=single,
+                   label=direntryexample]
+0000000: 5245 5355 4d45 2d31 5254 4620 00q3 347e  RESUME-1RTF ..4~
+0000010: 4a30 8830 0000 4a33 7830 0900 f121 0000  .0.0.....0...!..
+
+FILENAME = "RESUME-1.RTF"
+SIZE = 0x0000 21f1
+\end{lstlisting}
+}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{File attributes, Starting cluster}
+{\tt
+\begin{table}
+    \rowcolors[]{1}{blue!20}{blue!10}
+    \begin{tabular}{l | l }
+    Flag Value & Description \\ \hline
+    0x01       & Read only \\
+    0x02       & Hidden file \\
+    0x04       & System file \\
+    0x08       & Volume label \\
+    0x0f       & Long file name \\
+    0x10       & Directory \\
+    0x20       & Archive \\
+     \end{tabular}
+\end{table}
+}
+\begin{itemize}
+  \item How to calculate 1st cluster of the file
+  \begin{itemize}
+    \item Combine high 2 bytes and low 2 bytes to obtain
+    \item (Think about it... Hint: bit operation)
+  \end{itemize}
+  \item How to set 1st cluster of the file to DirEntry
+  \begin{itemize}
+    \item i.e. translate an 4 bytes address,e.g. 0x12345678 to high two bytes and low two bytes
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Milestones}
+\subsection{Introduction}
+\begin{frame}
+\frametitle{Introduction to assignment 3}
+\begin{itemize}
+  \item Three milestones in assignment 3
+\begin{enumerate}
+  \item List the contents -- think about {\tt ls}
+  \item Reading an existing file -- think about {\tt cat/dd}
+  \item Writing to an existing file -- think about {\tt echo}
+\end{enumerate}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{List}
+\begin{frame}
+\frametitle{List the contents of the root directory}
+\begin{itemize}
+  \item \textbf{Objective}:List the details of the files stored in the \textbf{root directory}
+  \begin{enumerate}
+    \item Read Boot Entry to locate the starting cluster of root directory
+    \item Follow the FAT to find out cluster chain of root directory
+    \item Read file information in each cluster
+  \end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Sample work flow}
+  \begin{figure}[!ht]
+  \centering
+    \includegraphics[width=\textheight]{ls.pdf}
+    \caption{Sample work flow}
+    \label{fig:list}
+  \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Sample output}{\tt
+\begin{lstlisting}[caption={List content output},
+                    frame=single,
+                   label=src:list]
+    $ ./a3 <arguments>
+    FILENAME        FILE SIZE       STARTING CLUSTER #
+    --------------------------------------------------
+    MAKEFILE        21              11
+    TEST.C          1023            12
+    HELLO.MP3       4194304         14
+
+    Total number of entries = 3
+    $ _
+\end{lstlisting}}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Read file}
+\begin{frame}
+\frametitle{Reading an existing file}
+\begin{itemize}
+  \item \textbf{Objective}:Read and output contents from an existing file in \textbf{root directory}.
+  \begin{enumerate}
+    \item Search the given file in directory, return fail if not found
+    \item Reads meta information of the file(size, starting cluster)
+    \item Output file content according to \textbf{cluster chain}
+  \end{enumerate}
+  \item  The pathname is valid characters
+  \begin{itemize}
+    \item 8.3 format
+    \item uppercase alphabets, digits
+    \item {\tt \$ \% ' ` - \@ \{ \} \~{} ! \# ( ) \& \_ $\land$}\\
+  \end{itemize}
+  \item The last cluster of the file \textbf{may not be fully filled}
+\end{itemize}
+\begin{figure}
+\centering
+\includegraphics[width=0.7\textwidth]{direntry.pdf}
+\caption{Example: Clusters occupied by a certain file}
+\end{figure}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{Sample work flow}
+  \begin{figure}[!ht]
+  \centering
+    \includegraphics[height=0.8\textheight]{read.pdf}
+    \caption{Sample work flow}
+    \label{fig:read}
+  \end{figure}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Q \& A}
+\frame{
+\frametitle{Q \& A Session}
+\begin{center}
+{\Huge Thank You}
+\end{center}
+\begin{center}
+Now you should be able to complete Milestone 1 \& 2\\
+ - See You Next Week -
+\end{center}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{\protect \scalebox{0.7}{Acknowledgement}}
+%\section{Ack.}
+\frame{
+\frametitle{Acknowledgement}
+\begin{itemize}
+\item{Some materials and pictures are from last year's tutorial notes made by \emph{Mr.Cheong Chi Hong}}
+\item{The style of this slide is adapted from the template made by \emph{HUANG Zheng-hua} in \emph{Wuhan University}}
+\item{Google ``vfs'' to learn more about filesystem in Linux}
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

@@ -1,0 +1,141 @@
+\def\CTeXPreproc{Created by ctex v0.2.12, don't edit!}\documentclass[CJK,notheorems,mathserif,table]{beamer}
+
+\useoutertheme[height=0.11\textwidth,width=0.15\textwidth]{sidebar}
+\usecolortheme{whale}      % Outer color themes, 其他选择: whale, seahorse, dolphin . 换一个编译看看有什么不同.
+\usecolortheme{orchid}     % Inner color themes, 其他选择: lily, orchid
+\useinnertheme[shadow]{rounded} % 对 box 的设置: 圆角、有阴影.
+\setbeamercolor{sidebar}{bg=blue!30} % sidebar的颜色, 50%的蓝色.
+\setbeamercolor{logo}{bg=blue!50}   % logo的颜色
+%\setbeamercolor{background canvas}{bg=blue!9} % 背景色, 9%的蓝色. 去掉下一行, 试一试这个.
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!25] %%背景色, 上25%的蓝, 过渡到下白.
+\usefonttheme{serif}  % 字体. 个人偏好有轮廓的字体. 去掉这个设置编译, 就看到不同了.
+\setbeamertemplate{navigation symbols}{}   %% 去掉页面下方默认的导航条.
+%%------------------------常用宏包---------------------------------------------------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+\usepackage{CJK}
+\usepackage{subfigure} %%图形或表格并排排列
+\usepackage{xmpmulti}  %%支持文中的 \multiinclude 等命令, 使 mp 文件逐帧出现. 具体讨论见 beamer 手册.
+\usepackage{colortbl,dcolumn}     %% 彩色表格
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+\DeclareGraphicsRule{*}{mps}{*}{} %% 使 pdflatex 可以纳入 metapost 做的图片.
+
+\logo{\includegraphics[height=0.09\textwidth]{logo.pdf}}%% 校徽
+
+\renewcommand{\raggedright}{\leftskip=0pt \rightskip=0pt plus 0cm}
+\raggedright %% 中文对齐
+
+\def\hilite<#1>{\temporal<#1>{\color{blue!35}}{\color{magenta}}{\color{blue!75}}}
+%% 自定义命令, 源自 beamer_guide. item 逐步显示时, 使已经出现的item、正在显示的item、将要出现的item 呈现不同颜色.
+
+\newcolumntype{H}{>{\columncolor{blue!20}}c!{\vrule}}
+\newcolumntype{H}{>{\columncolor{blue!20}}c}  %% 表格设置
+%==================================参考文献==============================================================
+\newcommand{\upcite}[1]{\textsuperscript{\cite{#1}}}  %自定义命令\upcite, 使参考文献引用以上标出现
+\bibliographystyle{plain}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%重定义字体、字号命令 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\songti}{\CJKfamily{song}}        % 宋体
+\newcommand{\fangsong}{\CJKfamily{fs}}        % 仿宋体
+\newcommand{\kaishu}{\CJKfamily{kai}}         % 楷体
+\newcommand{\heiti}{\CJKfamily{hei}}          % 黑体
+\newcommand{\lishu}{\CJKfamily{li}}           % 隶书
+\newcommand{\youyuang}{\CJKfamily{you}}       % 幼圆
+\newcommand{\sihao}{\fontsize{14pt}{\baselineskip}\selectfont}      % 字号设置
+\newcommand{\xiaosihao}{\fontsize{12pt}{\baselineskip}\selectfont}  % 字号设置
+\newcommand{\wuhao}{\fontsize{10.5pt}{\baselineskip}\selectfont}    % 字号设置
+\newcommand{\xiaowuhao}{\fontsize{9pt}{\baselineskip}\selectfont}   % 字号设置
+\newcommand{\liuhao}{\fontsize{7.875pt}{\baselineskip}\selectfont}  % 字号设置
+\newcommand{\qihao}{\fontsize{5.25pt}{\baselineskip}\selectfont}    % 字号设置
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Slide Template}
+\author[\textcolor{white}{XIAO,Zigang}]{{XIAO
+Zigang\\\mbox{\textcolor{blue}{\underline{zgxiao@cse.cuhk.edu.hk}}}}}
+\institute{\wuhao \textcolor{black}{Department of Computer Science and
+Engineering\\The Chinese University of Hong Kong}}
+\date{\today}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\begin{CJK*}{GBK}{kai}
+\frame{\titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Outline
+\section*{Outline} % outline ( in the left bar )
+\frame{\frametitle{Outline}\tableofcontents}
+
+\section{1st}   % to be appeared as the 1st title
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  This is in a page
+\subsection{1.1}    % appeared under '1st'
+\frame {
+\frametitle{1.1 title}  % in the top bar
+
+\begin{itemize}
+\item<1-> item 1    % in the main page, one by one
+\item<2-> item 2
+\item<3-> item 3
+\end{itemize}
+}
+% page end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{1.2}
+\frame {
+\frametitle{1.2 title}
+
+\begin{itemize}
+\item<1-> item 1.2.1
+\item<2-> item 1.2.2
+\item<3-> item 1.2.3
+\end{itemize}
+}
+
+\section{2nd}
+\subsection{2.1}
+\frame {
+\frametitle{2.1 title}
+
+\begin{itemize}
+\item<1-> dummy
+\end{itemize}
+}
+
+
+\section{3rd}
+    \subsection{3.1}
+    \frame {
+    \frametitle{3.1 title}
+
+    \begin{itemize}
+    \item<1-> dummy
+
+    \end{itemize}
+    }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Q \& A}
+\frame{
+\frametitle{Q \& A Session}
+\begin{center}
+{\Huge Thank You}
+\end{center}
+\begin{center}
+See You Next Week...
+\end{center}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Acknowledge}
+\frame{
+\frametitle{Acknowledgement}
+\begin{itemize}
+\item<1->{This slide is adapted from the template made by \emph{Huang Zhenghua} in \emph{Wuhan University}}
+\item<2->{Some materials and pictures are from last year's tutorial notes made by \emph{Dr.Cheong Chi Hong}}
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{CJK*}
+\end{document}

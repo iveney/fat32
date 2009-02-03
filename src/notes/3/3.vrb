@@ -1,0 +1,35 @@
+\frametitle {Sample output}
+{\tt
+    \begin{lstlisting}[frame=single,
+                       caption={Sample output},
+                        stringstyle=\color{black}]
+$ ./a3 -m 1 -d ./filesystem
+FILENAME        FILE SIZE       STARTING CLUSTER #
+--------------------------------------------------
+A.TXT           4               3
+B.TXT           800             4
+C.TXT           100             6
+D.TXT           800             7
+
+Total number of entries = 4
+$ ./a3 -m 2 -d ./filesystem -t C.TXT | xxd
+0000000: cd5e 10e7 e7ec 1988 006b 6974 7e5b f3a5  .^.......kit~[..
+0000010: 78cd 7ab3 daa9 2687 8814 269d b2c3 fd7f  x.z...&...&.....
+...
+$ cat rd/A.TXT
+123
+$ echo "hello :)" > input_file.txt
+# use truncation mode here
+$ umount filesystem
+$ ./a3 -m 3 -d filesystem -t A.TXT -w t -i input_file.txt && sync
+$ mount -t vfat ./filesystem ./rd -o loop,umask=000 -v
+$ cat rd/A.TXT
+hello :)
+# use appendage mode here
+$ umount filesystem
+$ ./a3 -m 3 -d filesystem -t A.TXT -w a -i input_file.txt && sync
+$ mount -t vfat ./filesystem ./rd -o loop,umask=000 -v
+$ ./a3 -m 2 -d filesystem -t A.TXT
+hello :)
+hello :)\end{lstlisting}
+}

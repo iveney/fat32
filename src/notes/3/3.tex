@@ -1,0 +1,404 @@
+\documentclass[notheorems,mathserif,table]{beamer}
+\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{graphicx}
+\useoutertheme[height=0.11\textwidth,width=0.15\textwidth,hideothersubsections]{sidebar}
+\usecolortheme{whale}      % Outer color themes, 其他选择: whale, seahorse, dolphin . 换一个编译看看有什么不同.
+\usecolortheme{orchid}     % Inner color themes, 其他选择: lily, orchid
+\useinnertheme[shadow]{rounded} % 对 box 的设置: 圆角、有阴影.
+
+%\setbeamercolor{background canvas}{bg=blue!9} % 背景色, 9%的蓝色. 去掉下一行, 试一试这个.
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!25] %%背景色, 上25%的蓝, 过渡到下白.
+\usefonttheme{serif}  % 字体. 个人偏好有轮廓的字体. 去掉这个设置编译, 就看到不同了.
+\setbeamertemplate{navigation symbols}{\insertframenumber  / \inserttotalframenumber ~~}   %% 去掉页面下方默认的导航条.
+%\setbeamertemplate{footline}[page number]
+\setbeamercolor{sidebar}{bg=blue!30} % sidebar的颜色, 50%的蓝色.
+\setbeamercolor{logo}{bg=blue!50}   % logo的颜色
+%%------------------------常用宏包---------------------------------------------------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+
+\usepackage{subfigure} %%图形或表格并排排列
+\usepackage{xmpmulti}  %%支持文中的 \multiinclude 等命令, 使 mp 文件逐帧出现. 具体讨论见 beamer 手册.
+\usepackage{colortbl,dcolumn}     %% 彩色表格
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+\DeclareGraphicsRule{*}{mps}{*}{} %% 使 pdflatex 可以纳入 metapost 做的图片.
+
+\logo{\includegraphics[height=0.09\textwidth]{logo.pdf}}%% 校徽
+
+\renewcommand{\raggedright}{\leftskip=0pt \rightskip=0pt plus 0cm}
+\raggedright %% 中文对齐
+
+\def\hilite<#1>{\temporal<#1>{\color{blue!35}}{\color{magenta}}{\color{blue!75}}}
+%% 自定义命令, 源自 beamer_guide. item 逐步显示时, 使已经出现的item、正在显示的item、将要出现的item 呈现不同颜色.
+
+\newcolumntype{H}{>{\columncolor{blue!20}}c!{\vrule}}
+\newcolumntype{H}{>{\columncolor{blue!20}}c}  %% 表格设置
+%==================================参考文献==============================================================
+\newcommand{\upcite}[1]{\textsuperscript{\cite{#1}}}  %自定义命令\upcite, 使参考文献引用以上标出现
+\bibliographystyle{plain}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%重定义字体、字号命令 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\sihao}{\fontsize{14pt}{\baselineskip}\selectfont}      % 字号设置
+\newcommand{\xiaosihao}{\fontsize{12pt}{\baselineskip}\selectfont}  % 字号设置
+\newcommand{\wuhao}{\fontsize{10.5pt}{\baselineskip}\selectfont}    % 字号设置
+\newcommand{\xiaowuhao}{\fontsize{9pt}{\baselineskip}\selectfont}   % 字号设置
+\newcommand{\liuhao}{\fontsize{7.875pt}{\baselineskip}\selectfont}  % 字号设置
+\newcommand{\qihao}{\fontsize{5.25pt}{\baselineskip}\selectfont}    % 字号设置
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\CSE}{\href{http://www.cse.cuhk.edu.hk}{Department of Computer Science and Engineering}}
+\newcommand{\CUHK}{\href{http://www.cuhk.edu.hk}{The Chinese University of Hong Kong}}
+\newcommand{\mymail}{\href{mailto:zgxiao@cse.cuhk.edu.hk}{\textcolor{blue}{\underline{zgxiao@cse.cuhk.edu.hk}}}}
+\newcommand{\myname}{XIAO Zigang}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{CSC/CEG 3150 Tutorial}
+\subtitle{Last Milestone in Assignment 3 \& tips}
+\author[ ]{\myname\\\mymail}
+\institute{\wuhao \textcolor{black}{\CSE\\\CUHK}}
+\date{\today}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lstset{% general command to set parameter(s)
+        language=bash,                     % C language synthx
+        %morekeywords={cout, using, _complex},   % add keywords
+        %keywordstyle=\color{blue},      % 关键词着色
+        commentstyle=\color{violet},     % black comments
+        captionpos=b,
+        frame=single,
+        stringstyle=\color{gray},                % typewriter type for strings
+        basicstyle=\tiny,               % print whole listing tiny
+        identifierstyle=,               % nothing happens
+        tabsize=4,                      % 制表符的空格数
+        stepnumber=1,
+        numbersep=5pt,
+        keepspaces=true,                % 保留空格
+        showspaces=false,               % 是否显示空格为一朝上的小方框
+        showstringspaces=false,         % 是否显示字符串中的空格为一朝上的小方框
+        escapeinside={/*@}{@*/}         % 用/*@label@*/标示指定代码行，
+                                        % 可以用\ref{label}引用
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\frame{\titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Outline
+\section[Outline]{Outline}
+\frame{\frametitle{Outline}\tableofcontents}
+
+\begin{comment}
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[current,currentsubsection]
+  \end{frame}
+}
+\end{comment}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Milestone 3}
+\begin{frame}
+\frametitle{Tasks in Milestone 3}
+\begin{itemize}
+  \item \textbf{Objective}: Writing to an \textbf{existing} file
+  \begin{itemize}
+    \item Truncation: \textbf{Discard} original data and write new content
+    \item Appendage: \textbf{Preserve} original data and write from the end of the target
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Truncation Mode work flow}
+\begin{figure}
+\centering
+\includegraphics[height=0.55\textwidth]{truncation.pdf}
+\caption{Illustration of truncation}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{FSINFO}
+\begin{itemize}
+  \item FSINFO data structure includes hints about where the OS can allocate new clusters.
+  \item Its location is given in the boot sector
+\end{itemize}
+{\tt
+\begin{lstlisting}[caption={FSINFO structure},
+                    frame=single,
+                    stringstyle=\color{black},
+                   label=FSINFOSRC]
+/* FSINFO,size=512B */
+#pragma pack(push,1)
+typedef struct FSInfo {
+        unsigned long FSI_LeadSig;        /* Signature (0x41615252) */
+        unsigned char FSI_Reserved1[480]; /* Not used */
+        unsigned long FSI_StrucSig;       /* Signature (0x61417272) */
+        unsigned long FSI_Free_Count;     /* Number of free clusters */
+        unsigned long FSI_Nxt_Free;       /* Next free cluster */
+        unsigned char FSI_Reserved2[12];  /* Not used */
+        unsigned long FSI_TrailSig;       /* Signature (0xAA550000) */
+}FSInfo;
+#pragma pack(pop)
+\end{lstlisting}
+}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Cluster allocation}
+\begin{itemize}
+  \item Different allocation scheme in implementations
+  \item You should implement a \textbf{circular, next-available} scheme
+  \item The next free cluster information is stored in FSINFO structure
+  \begin{itemize}
+    \item i.e. \textit{FSI\_Nxt\_Free}
+    \item Note: it stores the cluster value \textbf{just assigned}
+  \end{itemize}
+  \item Remember to update FSINFO after a cluster is allcoated!
+\end{itemize}
+\begin{figure}
+\centering
+    \includegraphics[width=0.5\textwidth]{allocation.pdf}
+    \caption{Illustration of truncation}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Appendage Mode work flow}
+\begin{figure}
+\centering
+\includegraphics[height=0.7\textwidth]{appendage.pdf}
+\caption{Illustration of appendage}
+\end{figure}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Debug}
+\begin{frame}[fragile]
+\frametitle{How to debug your program?}
+\begin{itemize}
+  \item Here is one scenario you may follow:
+\end{itemize}
+{\tt
+    \begin{lstlisting}[frame=single,
+                        stringstyle=\color{black}]
+# create a disk image file, size = 64M
+$ dd if=/dev/zero of=./fs bs=1M count=64
+# format as FAT32 filesystem(you may also use /dev/ram[x] here)
+$ /sbin/mkfs.vfat -v -F 32 -f 2 -S 512 -s 1 -R 32 ./fs
+# you may backup this file here for later use
+
+# mount to a certain mount point
+$ mkdir /mnt/rd
+$ mount -t vfat -o loop,umask=000 ./fs /mnt/rd
+# You can write a script/make rule to do stuff listed above
+
+# make some change here...
+$ echo "void main(){}" > /mnt/rd/TEST.C
+$ touch /mnt/rd/MAKEFILE
+# synchronize change
+$ sync
+
+# check your program
+$ make
+$ ./a3 -m 1 -d ./fs
+$ sync
+# ... (check your output)
+    \end{lstlisting}
+}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{utilize {\tt make}}
+\begin{itemize}
+  \item {\tt make} is very convenient in this assignment, e.g.
+  \begin{itemize}
+    \item include {\tt DEBUG} switch in your program, i.e.
+{\tt
+    \begin{lstlisting}[frame=single,
+                        stringstyle=\color{black}]
+#ifdef DEBUG
+    printf("program reaches here...\n");
+    ...
+#endif
+    \end{lstlisting}
+}
+    \item when compile your program with \\
+    {\tt \#define DEBUG}\\
+    or\\
+    {\tt gcc <other-options> -DDEBUG}\\
+    The codes between {\tt \#ifdef/\#endif} will be included.
+  \end{itemize}
+  \item You can add a \textbf{debug rule} in your makefile, then you may use:\\
+  {\tt \$ make debug}\\
+  to compile a debug version
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Example of test batch}
+\begin{itemize}
+  \item You are strongly encouraged to write script/make rule to initialize your disk image
+  \item Please be reminded that {\tt mkfs.vfat} will NOT help you to clear original content in the disk image
+\end{itemize}
+{\tt
+    \begin{lstlisting}[frame=single,
+                       caption={Example of script},
+                        stringstyle=\color{black}]
+$ cat ./initfs
+#!/bin/bash
+dd if=/dev/zero of=filesystem bs=1M count=64
+/sbin/mkfs.vfat -v -F 32 -f 2 -S 512 -s 1 -R 32 ./filesystem
+mount -t vfat ./filesystem ./rd -o loop,umask=000 -v
+
+echo 123 > ./rd/A.TXT
+# file ``ascii'' contains some ascii characters
+cat ascii > ./rd/B.TXT
+dd if=/dev/urandom of=./rd/C.TXT bs=64 count=1
+# file ``raw'' contains some raw contents
+cat raw > ./rd/D.TXT
+
+sync
+    \end{lstlisting}
+}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Sample output}
+{\tt
+    \begin{lstlisting}[frame=single,
+                       caption={Sample output},
+                        stringstyle=\color{black}]
+$ ./a3 -m 1 -d ./filesystem
+FILENAME        FILE SIZE       STARTING CLUSTER #
+--------------------------------------------------
+A.TXT           4               3
+B.TXT           800             4
+C.TXT           100             6
+D.TXT           800             7
+
+Total number of entries = 4
+$ ./a3 -m 2 -d ./filesystem -t C.TXT | xxd
+0000000: cd5e 10e7 e7ec 1988 006b 6974 7e5b f3a5  .^.......kit~[..
+0000010: 78cd 7ab3 daa9 2687 8814 269d b2c3 fd7f  x.z...&...&.....
+...
+$ cat rd/A.TXT
+123
+$ echo "hello :)" > input_file.txt
+# use truncation mode here
+$ umount filesystem
+$ ./a3 -m 3 -d filesystem -t A.TXT -w t -i input_file.txt && sync
+$ mount -t vfat ./filesystem ./rd -o loop,umask=000 -v
+$ cat rd/A.TXT
+hello :)
+# use appendage mode here
+$ umount filesystem
+$ ./a3 -m 3 -d filesystem -t A.TXT -w a -i input_file.txt && sync
+$ mount -t vfat ./filesystem ./rd -o loop,umask=000 -v
+$ ./a3 -m 2 -d filesystem -t A.TXT
+hello :)
+hello :)\end{lstlisting}
+}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Tips}
+\begin{frame}
+\frametitle{Some facts}
+\begin{itemize}
+  \item Where is the root directory?
+  \begin{itemize}
+    \item Check BootEntry structure
+  \end{itemize}
+  \item How many Directory Entries in a cluster?
+  \begin{itemize}
+    \item $=cluster\_size / DirEntry\_size$
+  \end{itemize}
+  \item What is the usage of the reserved sectors, other than BootEntry,FSINFO?
+  \begin{itemize}
+    \item Reserved for system use(e.g. backup, upgrade)
+  \end{itemize}
+  \item What is a DirEntry?
+  \begin{itemize}
+    \item It contains the name and metadata for a file or directory.
+    Each file or directory is allocated one DirEntry,
+    it is located in the clusters allocated to the file's parent directory
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Some facts(cont.)}
+\begin{itemize}
+  \item How do we know if a DirEntry is available?
+  \begin{itemize}
+    \item Allocation status of a directory entry is determined by using the first byte:
+    \begin{itemize}
+      \item {\tt0x00} or {\tt0x0e} : unallocated
+      \item Others: allocated
+    \end{itemize}
+  \end{itemize}
+  \item What is the size of a directory?
+  \begin{itemize}
+    \item The size field in the DirEntry of a directory is not used and should always be 0.
+    \item The only way to determine the size of the directory is to follow the cluster chain in FAT
+  \end{itemize}
+  \item What is the usage of entry 0 and 1 in FAT table?
+  \begin{itemize}
+    \item Cluster starts from index 2
+    \item Generally, 0 records media type, 1 records dirty status of file system
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Hints}
+\begin{enumerate}
+  \item You are not required to update \textit{create time, access time, etc.} fields
+        in Directory entry in this assignment.
+  \item After changes are made to the file system(e.g.  create/remove a file),
+   you may find that the file system read by your program is not updated.
+  \item Kernel keeps data in memory in order to avoid slow disk I/O
+  \begin{itemize}
+    \item Data will be written back ``gradually''
+  \end{itemize}
+  \item Use {\tt sync} to flush the data
+  \item or use {\tt sync()} in your program
+  \item If {\tt sync} does not work, try {\tt umount} and then {\tt mount} again.
+\end{enumerate}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Q \& A}
+\frame{
+\frametitle{Q \& A Session}
+\begin{center}
+{\Huge Thank You}
+\end{center}
+\begin{center}
+Now you should understand FAT32\\
+ - Have fun in assignment 3 -
+\end{center}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{\protect \scalebox{0.7}{Acknowledgement}}
+%\section{Ack.}
+\frame{
+\frametitle{Acknowledgement}
+\begin{itemize}
+\item{Some materials and pictures are from last year's tutorial notes made by \emph{Mr.Cheong Chi Hong}}
+\item{The style of this slide is adapted from the template made by \emph{HUANG Zheng-hua} in \emph{Wuhan University}}
+\item{Google ``vfs'' to learn more about filesystem in Linux}
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

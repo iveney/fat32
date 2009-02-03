@@ -1,0 +1,32 @@
+\frametitle {Example and codes}
+\begin{itemize}
+  \item{What is the output?\\
+{\tt\begin{lstlisting}[
+                basicstyle=\tiny ,
+                stringstyle=\color{black}]
+#include <stdio.h>
+
+int main(){
+        char ch[]={1,2,3,4};
+        long int a=*((long int*)ch);
+        // %.08x outputs a 8-digit hex number, padded with 0
+        // man printf for more detail
+        printf("0x%.08x\n",a);
+        return 0;
+}
+\end{lstlisting}}
+}
+
+  \pause \item {
+  Result in sparc machine(big endian): {\tt 0x01020304}
+
+  }
+  \pause \item {
+  Result in Pentium machine(little endian): {\tt 0x04030201}
+  }
+  \pause \item{Check your processor}
+    \begin{itemize}
+    \item {\tt \$ uname -sp}
+    \item {\tt \$ cat /proc/cpuinfo} (Linux only)
+    \end{itemize}
+\end{itemize}

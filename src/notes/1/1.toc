@@ -1,0 +1,12 @@
+\beamer@endinputifotherversion {3.06pt}
+\beamer@sectionintoc {1}{Outline}{2}{0}{1}
+\beamer@sectionintoc {2}{Tips}{3}{0}{2}
+\beamer@subsectionintoc {2}{1}{\tt getopt}{3}{0}{2}
+\beamer@subsectionintoc {2}{2}{\tt xxd}{11}{0}{2}
+\beamer@subsectionintoc {2}{3}{\tt dd}{12}{0}{2}
+\beamer@subsectionintoc {2}{4}{\tt mkfs}{13}{0}{2}
+\beamer@subsectionintoc {2}{5}{{\tt [u]mount}}{15}{0}{2}
+\beamer@subsectionintoc {2}{6}{\tt endian}{22}{0}{2}
+\beamer@subsectionintoc {2}{7}{\tt others}{27}{0}{2}
+\beamer@sectionintoc {3}{Q \& A}{28}{0}{3}
+\beamer@sectionintoc {4}{ \scalebox {0.7}{Acknowledgement}}{29}{0}{4}

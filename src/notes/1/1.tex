@@ -1,0 +1,589 @@
+\documentclass[notheorems,mathserif,table]{beamer}
+\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{graphicx}
+\useoutertheme[height=0.11\textwidth,width=0.15\textwidth,hideothersubsections]{sidebar}
+\usecolortheme{whale}      % Outer color themes, 其他选择: whale, seahorse, dolphin . 换一个编译看看有什么不同.
+\usecolortheme{orchid}     % Inner color themes, 其他选择: lily, orchid
+\useinnertheme[shadow]{rounded} % 对 box 的设置: 圆角、有阴影.
+
+%\setbeamercolor{background canvas}{bg=blue!9} % 背景色, 9%的蓝色. 去掉下一行, 试一试这个.
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!25] %%背景色, 上25%的蓝, 过渡到下白.
+\usefonttheme{serif}  % 字体. 个人偏好有轮廓的字体. 去掉这个设置编译, 就看到不同了.
+\setbeamertemplate{navigation symbols}{\insertframenumber  / \inserttotalframenumber ~~}   %% 去掉页面下方默认的导航条.
+%\setbeamertemplate{footline}[page number]
+\setbeamercolor{sidebar}{bg=blue!30} % sidebar的颜色, 50%的蓝色.
+\setbeamercolor{logo}{bg=blue!50}   % logo的颜色
+%%------------------------常用宏包---------------------------------------------------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+
+\usepackage{subfigure} %%图形或表格并排排列
+\usepackage{xmpmulti}  %%支持文中的 \multiinclude 等命令, 使 mp 文件逐帧出现. 具体讨论见 beamer 手册.
+\usepackage{colortbl,dcolumn}     %% 彩色表格
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+\DeclareGraphicsRule{*}{mps}{*}{} %% 使 pdflatex 可以纳入 metapost 做的图片.
+
+\logo{\includegraphics[height=0.09\textwidth]{logo.pdf}}%% 校徽
+
+\renewcommand{\raggedright}{\leftskip=0pt \rightskip=0pt plus 0cm}
+\raggedright %% 中文对齐
+
+\def\hilite<#1>{\temporal<#1>{\color{blue!35}}{\color{magenta}}{\color{blue!75}}}
+%% 自定义命令, 源自 beamer_guide. item 逐步显示时, 使已经出现的item、正在显示的item、将要出现的item 呈现不同颜色.
+
+\newcolumntype{H}{>{\columncolor{blue!20}}c!{\vrule}}
+\newcolumntype{H}{>{\columncolor{blue!20}}c}  %% 表格设置
+%==================================参考文献==============================================================
+\newcommand{\upcite}[1]{\textsuperscript{\cite{#1}}}  %自定义命令\upcite, 使参考文献引用以上标出现
+\bibliographystyle{plain}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%重定义字体、字号命令 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\sihao}{\fontsize{14pt}{\baselineskip}\selectfont}      % 字号设置
+\newcommand{\xiaosihao}{\fontsize{12pt}{\baselineskip}\selectfont}  % 字号设置
+\newcommand{\wuhao}{\fontsize{10.5pt}{\baselineskip}\selectfont}    % 字号设置
+\newcommand{\xiaowuhao}{\fontsize{9pt}{\baselineskip}\selectfont}   % 字号设置
+\newcommand{\liuhao}{\fontsize{7.875pt}{\baselineskip}\selectfont}  % 字号设置
+\newcommand{\qihao}{\fontsize{5.25pt}{\baselineskip}\selectfont}    % 字号设置
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\CSE}{\href{http://www.cse.cuhk.edu.hk}{Department of Computer Science and Engineering}}
+\newcommand{\CUHK}{\href{http://www.cuhk.edu.hk}{The Chinese University of Hong Kong}}
+\newcommand{\mymail}{\href{mailto:zgxiao@cse.cuhk.edu.hk}{\textcolor{blue}{\underline{zgxiao@cse.cuhk.edu.hk}}}}
+\newcommand{\myname}{XIAO Zigang}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{CSC/CEG 3150 Tutorial}
+\subtitle{Programming Tips and Tools for Assignment 3}
+\author[ ]{\myname\\\mymail}
+\institute{\wuhao \textcolor{black}{\CSE\\\CUHK}}
+\date{\today}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lstset{% general command to set parameter(s)
+        language=C,                     % C language synthx
+        morekeywords={cout, using, _complex},   % add keywords
+        keywordstyle=\color{blue},      % 关键词着色
+        commentstyle=\color{violet},     % black comments
+        captionpos=b,
+        frame=single,
+        stringstyle=\color{gray},                % typewriter type for strings
+        basicstyle=\tiny,               % print whole listing tiny
+        identifierstyle=,               % nothing happens
+        tabsize=4,                      % 制表符的空格数
+        stepnumber=1,
+        numbersep=5pt,
+        keepspaces=true,                % 保留空格
+        showspaces=false,               % 是否显示空格为一朝上的小方框
+        showstringspaces=false,         % 是否显示字符串中的空格为一朝上的小方框
+        escapeinside={/*@}{@*/}         % 用/*@label@*/标示指定代码行，
+                                        % 可以用\ref{label}引用
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\frame{\titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Outline
+\section[Outline]{Outline}
+\frame{\frametitle{Outline}\tableofcontents}
+
+\begin{comment}
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[current,currentsubsection]
+  \end{frame}
+}
+\end{comment}
+
+\section{Tips}   % to be appeared as the 1st title
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  This is in a page
+\subsection{\tt getopt}    % appeared under '1st'
+
+\begin{frame}
+\frametitle{Command line argument}  % in the top bar
+\begin{itemize}
+    \item {Recall that for some command in Linux,e.g. {\tt /bin/ls}}
+    \begin{itemize}
+        \item{\tt{/bin/ls -l -a}}
+        \item{\tt{/bin/ls -la}}
+        \item{\tt{/bin/ls -la --file-type --color=auto -w 30 /usr /lib}}
+    \end{itemize}
+    \item {We can observe at least three behaviors:}
+    \begin{itemize}
+        \item{It receives multiple arguments}
+        \item{There are short arguments and long arguments, which may require a following value or not}
+        \item{We can group similar short arguments together}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{How to handle argument elegantly?}  % in the top bar
+\begin{itemize}
+    \item {Different milestones in Assignment 3 need different input arguments}
+    \begin{itemize}
+        \item{\tt ./Main -i}
+        \item{\tt ./Main -r}
+        \item{\tt ./Main -w}
+        \item{\tt ./Main -a}
+        \item{\tt ./Main -r}
+    \end{itemize}
+
+    \item {How do we parse the command-line argument?}
+    \begin{itemize}
+        \item{Hard code it with the help of {\tt strtok}}
+            \begin{itemize}
+                \item[-] Tedious, different program needs similar parse code
+            \end{itemize}
+        \item{We do not want those stuff bother program's main logic}
+            \begin{itemize}
+                \item[-] Is there any standard way to do it? - {\tt getopt}
+            \end{itemize}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{{\tt argc} and {\tt argv} revisited}
+\begin{itemize}
+    \item{{\tt int argc} : Number of arguments}
+    \begin{itemize}\item Including the executable name \end{itemize}
+    \item{{\tt char * argv[]} : List of arguments}
+    \begin{itemize}\item Null terminated.\end{itemize}
+    \item{E.g. \tt ./main -a test -b }
+    \begin{itemize}
+      \item \tt argc = 4
+      \item \tt argv[0] = ./Main
+      \item \tt argv[1] = -a
+      \item \tt argv[2] = test
+      \item \tt argv[3] = -b
+    \end{itemize}
+    \item{{\tt argv[4](=0)} is NULL.}
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{{\tt argc} and {\tt argv} example}
+\tt{
+\begin{lstlisting}[caption={Use argc and argv to parse arguments},
+                   label=args,
+                   basicstyle=\tiny,
+                   name=arg]
+#include <stdio.h>
+int main(int argc,char * argv[]){
+    int arg;
+    for(arg = 0; arg < argc ; arg++){
+        if('-' == argv[arg][0] )
+            printf("Options: %s\n", argv[arg]+1);
+        else
+            printf("argument %d: %s\n", arg,argv[arg]);
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={sample output},
+                   label=sample,
+                   basicstyle=\tiny]
+$ ./args -i -lr 'hi there' -f main.c
+argument 0: args
+option: i
+option: lr
+argument 3: hi there
+option: f
+argument 5: main.c
+\end{lstlisting}
+
+}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{{\tt getopt}}
+{\tt
+\begin{lstlisting}[caption={prototype of getopt},
+                    basicstyle=\tiny,
+                   label=getopt]
+#include <unistd.h>
+int getopt(int argc, char * const argv[],const char * optstring);
+extern char * optarg;
+extern int optind, opterr, optopt;
+\end{lstlisting}
+}
+\begin{itemize}
+  \item getopt uses argc,argv as parameters, as well as a string \textbf{``optstring"}
+  \item optstring tells getopt what options should be handled, and which option should follow a value
+  \item If a character is followed by a colon, that means the corresponding option requires an argument
+  \begin{itemize}
+    \item {\tt optstring = "ab"} means your program accepts {\tt "-a"} and {\tt "-b"}
+    \item {\tt optstring = "a:b"} means your program accepts {\tt "-a"} and {\tt "-b"}, and
+        option a requies an argument, which will be stored in {\tt "optarg"}
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Example of {\tt getopt}}
+{\tt
+\begin{lstlisting}[caption={Rewritting parser},
+                    basicstyle=\tiny ,
+                    numbers=left,
+                   label=rewrite]
+#include <unistd.h>
+#include <stdio.h>
+
+int main(int argc,char * argv[]){
+        int opt;
+        while( (opt = getopt(argc,argv,"if:lr")) != -1){
+                switch(opt){
+                case 'i':
+                case 'l':
+                case 'r':
+                        printf("Option: %c\n",opt);
+                        break;
+                case 'f':
+                        printf("filename: %s\n",optarg);
+                        break;
+                case ':':
+                        printf("Option needs a value\n");
+                        break;
+                case '?':
+                        printf("Unknown option: %c\n",optopt);
+                        break;
+                }
+        }
+        for(; optind < argc; optind++) /* note this */
+                printf("argument: %s\n",argv[optind]);
+        return 0;
+}
+\end{lstlisting}
+}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{A few words about {\tt extern}}
+\begin{itemize}
+    \item \textit{declare} a variable:
+    \begin{itemize}
+        \item {\tt int a;}
+    \end{itemize}
+        \item \textit{define} a variable:
+    \begin{itemize}
+        \item {\tt int a=0;}
+    \end{itemize}
+    \item In functions, the variables we \textit{defined} are allocated in stack.
+    \begin{itemize}
+        \item Automatically disappears after function returns.
+    \end{itemize}
+    \item The \textit{external variables} are globally accessible.
+    \item
+    \textit{
+    ``If the program is in several source files, and a variable is defined in file1 and used in file2 and file3,
+    then extern declarations are needed in file2 and file3 to connect the occurrences of the variable.''
+    }\footnote{K\&R, The C Programming Language}
+    \item {\tt optarg,optind,etc.} are defined in {\tt <getopt.h>}
+    \item You may check it in {\tt /usr/include/getopt.h}
+
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Some important facts...}
+\begin{itemize}
+  \item If an option needs an extra argument, {\tt optarg} associates with it.
+  \item When all the options are processed, {\tt getopt} returns -1
+  \item When an unrecognized option is received, {\tt getopt} returns {\tt `?'},{\tt optarg} saves this option character
+  \item Actually {\tt getopt} rewrites {\tt argv} array, see code linu 22-23 in Listing \ref{rewrite}
+  \item {\tt getopt\_long} can handle long arguments
+  \item For more details, ask {\tt man}
+  \begin{itemize}
+    \item {{\tt man getopt}}
+    \item {{\tt man getopt\_long}}
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+% page end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{\tt xxd}
+
+\begin{frame}[fragile]
+\frametitle{xxd}
+\begin{itemize}
+    \item Creates a hex dump of a given file or standard input
+    \item In Assignment 3
+    \begin{itemize}
+        \item Try {\tt xxd /dev/ram} - Too much output
+        \item Try {\tt xxd -s 0x40 -l 160 /dev/ram}
+    \begin{itemize}
+        \item Start to read at byte 0x40 (= byte 64)
+        \item Read 160 bytes
+    \end{itemize}
+\end{itemize}
+    \item The right column of the printout contains ascii output.
+    \begin{itemize}
+      \item {\tt man ascii} to get more detail
+    \end{itemize}
+    \item Another tool {\tt hd} can do similar work
+\end{itemize}
+{\tt
+\begin{lstlisting}[caption={Sample output of xxd},
+                basicstyle=\tiny ,
+                stringstyle=\color{black},
+                   label=xxd]
+0000040: 0000 29e7 41f7 4820 2020 2020 2020 2020  ..).A.H
+0000050: 2020 4641 5433 3220 2020 0e1f be77 7cac    FAT32   ...w|.
+0000060: 22c0 740b 56b4 0ebb 0700 cd10 5eeb f032  ".t.V.......^..2
+0000070: e4cd 16cd 19eb fe54 6869 7320 6973 206e  .......This is n
+0000080: 6f74 2061 2062 6f6f 7461 626c 6520 6469  ot a bootable di
+0000090: 736b 2e20 2050 6c65 6173 6520 696e 7365  sk.  Please inse
+00000a0: 7274 2061 2062 6f6f 7461 626c 6520 666c  rt a bootable fl
+00000b0: 6f70 7079 2061 6e64 0d0a 7072 6573 7320  oppy and..press
+00000c0: 616e 7920 6b65 7920 746f 2074 7279 2061  any key to try a
+00000d0: 6761 696e 202e 2e2e 200d 0a00 0000 0000  gain ... .......
+\end{lstlisting}
+}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\tt dd}
+\begin{frame}
+\frametitle{data definition\footnote{History of dd:\url{http://www.catb.org/jargon/html/D/dd.html}}}
+\begin{itemize}
+    \item{dd is a common UNIX program whose primary purpose is the \textbf{low-level} copying and conversion of \textbf{raw data}}
+    \item{Like most well-behaved commands, dd reads from its standard input and writes to its standard output}
+    \item{Use {\tt if} and {\tt of} to specify input and output}
+    \item{Use {\tt bs} and {\tt count} to specify data size($=bs*count$)}
+    \item{Example}
+    \begin{itemize}
+      \item{
+      Copies from /dev/zero to ./zeros with 2 blocks, each block counts for 1k bytes.\\
+      {\tt \$dd if=/dev/zero of=./zeros bs=1k count=2}
+      }
+      \item{
+      Copies from /dev/ram0 to ./header with a 512-byte block.\\
+      {\tt \$dd if=/dev/ram0 of=./header bs=512 count=1}
+      }
+    \end{itemize}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\tt mkfs}
+\begin{frame}
+\frametitle{mkfs and mkfs.vfat utilities}
+\begin{itemize}
+    \item Used to build  a  file  system on a device
+    \item It is just a wrapper for specific file system maker, e.g. mkfs.vfat links to mkdosfs
+    \item Example: \\ {\footnotesize \tt /sbin/mkfs.vfat -v -F 32 -f 2 -S 512 -s 1 -R 32 /dev/ram0}
+    \\Formats /dev/ram0 to a FAT32 file system
+    \begin{table}
+    { \tt
+    \rowcolors[]{1}{blue!20}{blue!10}
+    \begin{tabular}{l  l}
+      -F & specify FAT size (12,16,32)\\
+      -f & Fat table number\\
+      -S & logical sector size, default is 512B\\
+      -s & sector number per cluster\\
+      -R & number of reserved sectors\\
+     \end{tabular}
+    }
+    \end{table}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Play with disk image}
+\begin{itemize}
+    \item All things in UNIX are files...
+    \item You may use the \textbf{ramdisk} {\tt /dev/ram[0-9]} to create FAT32 file system
+    \footnote{(Ubuntu user might need \textbf{sudo} to access them)}
+
+    \begin{itemize}
+        \item ramdisk is memory mapping to the file, so it is fast
+    \end{itemize}
+    \item You may also use a normal file to create FAT32 file system
+    \item {\tt
+            \# touch a 64MB file\\
+            \$ dd if=/dev/zero of=./fs bs=1M count=64 \\
+            \# format as a FAT32 file system\\
+            \$ mkfs.vfat ./fs\\
+            \# Check the signature 0x55 and 0xAA\\
+            \$ xxd -s 510 -l 22 ./fs
+    }
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{{\tt [u]mount}}
+
+\begin{frame}
+\frametitle{Mounting the disk image}
+\begin{itemize}[<+->]
+    \item We have disk image now, so what?
+    \item We can mount it to our file system (hierarchy)
+    \item{\tt \footnotesize
+        \$ mkdir /mnt/rd\\
+        \$ mount -t vfat -o loop,umask=000 /dev/ram0 /mnt/rd}
+        \footnote{A loop device makes a file accessible as a block device, e.g. hard disk.}
+    \item Use {\tt fdisk -l} to list the partition tables of devices in your machine(need root privilege)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Syntax of {\tt mount}}
+{ \tt
+\$ mount -t fstype  -o options device dir
+    \begin{table}
+    \rowcolors[]{1}{blue!20}{blue!10}
+    \begin{tabular}{p{0.1\textwidth}p{0.85\textwidth}}
+      -t & file system type use ``vfat'' for FAT32\\
+      device & the source device(file) you want to mount\\
+      dir    & the destination directory(mount point)\\
+      -o & options\\
+     \end{tabular}
+    \end{table}
+}
+Some useful options are:
+{\tt
+    \begin{table}
+    \rowcolors[]{1}{blue!20}{blue!10}
+    \begin{tabular}{p{0.1\textwidth}p{0.85\textwidth}}
+        umask & the bitmask of the permissions that are not present(000 means anyone can read \& write)\\
+        loop  & use a loop device\\
+    \end{tabular}
+    \end{table}
+}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Mounting the disk image(cont.)}
+\begin{figure}
+\centering
+\includegraphics[width=0.9\textwidth]{fhs.pdf}
+\caption{Filesystem Hierarchy}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Unmounting the disk image}
+\begin{itemize}
+    \item We may do the reverse using {\tt umount}
+    \item The umount command detaches the file system(s) mentioned from the file hierarchy
+    \item E.g. {\tt /dev/sda1} is mounted on {\tt /usr/local}, and we want to unmount it.
+    \begin{itemize}
+      \item {\tt\$ umount /usr/local}
+      \item {\tt\$ umount /dev/sda1}
+    \end{itemize}
+    \item The first way is more appropriate since device may be mounted on more than one directory
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\tt endian}
+\begin{frame}
+\frametitle{Big endian and little endian}
+\begin{itemize}
+  \item In x86, the data is written in little endian ordering
+  \begin{itemize}
+    \item The least significant byte value is at the lowest address
+    \item The other bytes follow in increasing order of significance
+    \item E.g. Storage in memory with value = {\tt 0x0A0B0C0D}
+  \end{itemize}
+  \item Numbers will appear in reverse order
+  \item Strings will appear in the expected order
+\end{itemize}
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    0D & 0C & 0B & 0A\\
+    \hline
+\end{tabular}\\~\\
+\begin{tabular}{c c c}
+    Low address & $\rightarrow$ & High address\\
+\end{tabular}
+\caption{Illustration of endian}
+\end{table}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Example and codes}
+\begin{itemize}
+  \item{What is the output?\\
+{\tt\begin{lstlisting}[
+                basicstyle=\tiny ,
+                stringstyle=\color{black}]
+#include <stdio.h>
+
+int main(){
+        char ch[]={1,2,3,4};
+        long int a=*((long int*)ch);
+        // %.08x outputs a 8-digit hex number, padded with 0
+        // man printf for more detail
+        printf("0x%.08x\n",a);
+        return 0;
+}
+\end{lstlisting}}
+}
+
+  \pause \item {
+  Result in sparc machine(big endian): {\tt 0x01020304}
+
+  }
+  \pause \item {
+  Result in Pentium machine(little endian): {\tt 0x04030201}
+  }
+  \pause \item{Check your processor}
+    \begin{itemize}
+    \item {\tt \$ uname -sp}
+    \item {\tt \$ cat /proc/cpuinfo} (Linux only)
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{\tt others}
+\begin{frame}
+\frametitle{Other things you have learned}
+\begin{itemize}
+  \item editor : vi \& emacs \& ...
+  \item compiler : gcc
+  \item debugger : printf \& gdb
+  \item make \& makefile
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Q \& A}
+\frame{
+\frametitle{Q \& A Session}
+\begin{center}
+{\Huge Thank You}
+\end{center}
+\begin{center}
+Now you have enough handful tools to finish Assignment 3\\
+ - See You Next Week -
+\end{center}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{ \protect \scalebox{0.7}{Acknowledgement}}
+%\section{Ack.}
+\frame{
+\frametitle{Acknowledgement}
+\begin{itemize}
+\item{Some materials and pictures are from last year's tutorial notes made by \emph{Mr.Cheong Chi Hong}}
+\item{The style of this slide is adapted from the template made by \emph{HUANG Zheng-hua} in \emph{Wuhan University}}
+\item{Good Reference : cfaq\\ \url{http://c-faq.com/}}
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

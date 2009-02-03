@@ -1,0 +1,15 @@
+dd if=/dev/zero of=filesystem bs=1M count=64
+/sbin/mkfs.vfat -v -F 32 -f 2 -S 512 -s 1 -R 32 ./filesystem
+mount -t vfat ./filesystem ./rd -o loop,umask=000 -v
+
+echo 123 > rd/a.txt
+cat ascii > rd/b.txt
+dd if=/dev/zero of=rd/c.txt bs=100 count=1
+cat raw > rd/d.txt
+mkdir -p rd/dir1/dir2/dir3
+mkdir rd/dummy1
+mkdir rd/dummy2
+echo 111 > rd/dir1/1.txt
+echo 222 > rd/dir1/dir2/2.txt
+echo 333 > rd/dir1/dir2/dir3/3.txt
+sync

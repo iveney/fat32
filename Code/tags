@@ -1,0 +1,56 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.7	//
+BPB_BkBootSec	Main.c	/^	unsigned short BPB_BkBootSec __attribute__((packed));$/;"	m	struct:BootEntry	file:
+BPB_BytsPerSec	Main.c	/^	unsigned short BPB_BytsPerSec __attribute__((packed)); $/;"	m	struct:BootEntry	file:
+BPB_ExtFlags	Main.c	/^	unsigned short BPB_ExtFlags __attribute__((packed));$/;"	m	struct:BootEntry	file:
+BPB_FATSz16	Main.c	/^	unsigned short BPB_FATSz16 __attribute__((packed)); $/;"	m	struct:BootEntry	file:
+BPB_FATSz32	Main.c	/^	unsigned long BPB_FATSz32 __attribute__((packed));$/;"	m	struct:BootEntry	file:
+BPB_FSInfo	Main.c	/^	unsigned short BPB_FSInfo __attribute__((packed));$/;"	m	struct:BootEntry	file:
+BPB_FSVer	Main.c	/^	unsigned short BPB_FSVer __attribute__((packed));$/;"	m	struct:BootEntry	file:
+BPB_HiddSec	Main.c	/^	unsigned long BPB_HiddSec __attribute__((packed)); $/;"	m	struct:BootEntry	file:
+BPB_Media	Main.c	/^	unsigned char BPB_Media __attribute__((packed)); $/;"	m	struct:BootEntry	file:
+BPB_NumFATs	Main.c	/^	unsigned char BPB_NumFATs __attribute__((packed)); $/;"	m	struct:BootEntry	file:
+BPB_NumHeads	Main.c	/^	unsigned short BPB_NumHeads __attribute__((packed)); $/;"	m	struct:BootEntry	file:
+BPB_Reserved	Main.c	/^	unsigned char BPB_Reserved[12] __attribute__((packed));$/;"	m	struct:BootEntry	file:
+BPB_RootClus	Main.c	/^	unsigned long BPB_RootClus __attribute__((packed));$/;"	m	struct:BootEntry	file:
+BPB_RootEntCnt	Main.c	/^	unsigned short BPB_RootEntCnt __attribute__((packed)); $/;"	m	struct:BootEntry	file:
+BPB_RsvdSecCnt	Main.c	/^	unsigned short BPB_RsvdSecCnt __attribute__((packed)); $/;"	m	struct:BootEntry	file:
+BPB_SecPerClus	Main.c	/^	unsigned char BPB_SecPerClus __attribute__((packed)); $/;"	m	struct:BootEntry	file:
+BPB_SecPerTrk	Main.c	/^	unsigned short BPB_SecPerTrk __attribute__((packed)); $/;"	m	struct:BootEntry	file:
+BPB_TotSec16	Main.c	/^	unsigned short BPB_TotSec16 __attribute__((packed)); $/;"	m	struct:BootEntry	file:
+BPB_TotSec32	Main.c	/^	unsigned long BPB_TotSec32 __attribute__((packed)); $/;"	m	struct:BootEntry	file:
+BS_BootSig	Main.c	/^	unsigned char BS_BootSig __attribute__((packed));$/;"	m	struct:BootEntry	file:
+BS_DrvNum	Main.c	/^	unsigned char BS_DrvNum __attribute__((packed));$/;"	m	struct:BootEntry	file:
+BS_FilSysType	Main.c	/^	unsigned char BS_FilSysType[8] __attribute__((packed));$/;"	m	struct:BootEntry	file:
+BS_OEMName	Main.c	/^	unsigned char BS_OEMName[8] __attribute__((packed)); $/;"	m	struct:BootEntry	file:
+BS_Reserved1	Main.c	/^	unsigned char BS_Reserved1 __attribute__((packed));$/;"	m	struct:BootEntry	file:
+BS_VolID	Main.c	/^	unsigned long BS_VolID __attribute__((packed));$/;"	m	struct:BootEntry	file:
+BS_VolLab	Main.c	/^	unsigned char BS_VolLab[11] __attribute__((packed));$/;"	m	struct:BootEntry	file:
+BS_jmpBoot	Main.c	/^	unsigned char BS_jmpBoot[3] __attribute__((packed)); $/;"	m	struct:BootEntry	file:
+BootEntry	Main.c	/^struct BootEntry $/;"	s	file:
+DIR_Attr	Main.c	/^	unsigned char DIR_Attr __attribute__((packed));$/;"	m	struct:DirEntry	file:
+DIR_CrtDate	Main.c	/^	unsigned short DIR_CrtDate __attribute__((packed));$/;"	m	struct:DirEntry	file:
+DIR_CrtTime	Main.c	/^	unsigned short DIR_CrtTime __attribute__((packed));$/;"	m	struct:DirEntry	file:
+DIR_CrtTimeTenth	Main.c	/^	unsigned char DIR_CrtTimeTenth __attribute__((packed));$/;"	m	struct:DirEntry	file:
+DIR_FileSize	Main.c	/^	unsigned long DIR_FileSize __attribute__((packed));$/;"	m	struct:DirEntry	file:
+DIR_FstClusHI	Main.c	/^	unsigned short DIR_FstClusHI __attribute__((packed));$/;"	m	struct:DirEntry	file:
+DIR_FstClusLO	Main.c	/^	unsigned short DIR_FstClusLO __attribute__((packed));$/;"	m	struct:DirEntry	file:
+DIR_LstAccDate	Main.c	/^	unsigned short DIR_LstAccDate __attribute__((packed));$/;"	m	struct:DirEntry	file:
+DIR_NTRes	Main.c	/^	unsigned char DIR_NTRes __attribute__((packed));$/;"	m	struct:DirEntry	file:
+DIR_Name	Main.c	/^	unsigned char DIR_Name[11] __attribute__((packed));$/;"	m	struct:DirEntry	file:
+DIR_WrtDate	Main.c	/^	unsigned short DIR_WrtDate __attribute__((packed));$/;"	m	struct:DirEntry	file:
+DIR_WrtTime	Main.c	/^	unsigned short DIR_WrtTime __attribute__((packed));$/;"	m	struct:DirEntry	file:
+DirEntry	Main.c	/^struct DirEntry$/;"	s	file:
+EOC	Main.c	12;"	d	file:
+FAT	Main.c	/^unsigned long *FAT;$/;"	v
+MAX	Main.c	11;"	d	file:
+bps	Main.c	/^int bps;		\/\/bytes per sector$/;"	v
+fid	Main.c	/^int fid;$/;"	v
+main	Main.c	/^int main()$/;"	f
+read_sectors	Main.c	/^int read_sectors(int sector_number, unsigned char *buffer, int num_sectors)$/;"	f
+spc	Main.c	/^int spc;		\/\/sectors per cluster$/;"	v
+write_sectors	Main.c	/^int write_sectors(int sector_number, unsigned char *buffer, int num_sectors)$/;"	f

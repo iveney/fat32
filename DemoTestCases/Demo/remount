@@ -1,0 +1,5 @@
+umount /dev/ram
+umount /dev/ram
+umount /dev/ram
+umount /dev/ram
+mount -t vfat /dev/ram /mnt/rd -o loop

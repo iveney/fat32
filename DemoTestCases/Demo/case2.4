@@ -1,0 +1,24 @@
+umount /mnt/rd
+/sbin/mkfs.vfat -F 32 -f2 -S512 -s1 -R32 /dev/ram
+mount -t vfat /dev/ram /mnt/rd -o loop
+touch /mnt/rd/1.txt
+touch /mnt/rd/2.txt
+touch /mnt/rd/3.txt
+touch /mnt/rd/4.txt
+touch /mnt/rd/5.txt
+touch /mnt/rd/6.txt
+touch /mnt/rd/7.txt
+touch /mnt/rd/8.txt
+touch /mnt/rd/9.txt
+mkdir /mnt/rd/dir1
+mkdir /mnt/rd/dir2
+mkdir /mnt/rd/dir3
+mkdir /mnt/rd/dir4
+mkdir /mnt/rd/dir5
+mkdir /mnt/rd/dir6
+mkdir /mnt/rd/dir7
+mkdir /mnt/rd/dir8
+mkdir /mnt/rd/dir9
+touch /mnt/rd/test1.txt
+mkdir /mnt/rd/test2
+sync

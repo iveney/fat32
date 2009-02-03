@@ -1,0 +1,485 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[dvips]{graphicx, color}
+\usepackage{amsmath,amssymb,verbatim}
+
+\linespread{1.3}
+
+\title{{\bf CSC/CEG 3150 Assignment 3 Bonus}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Recover a deleted file in a subdirectory with no absolute path given and fewer assumptions}
+
+\textbf{Important: this task will be graded.}
+
+In this part, you need to recover a deleted file in a subdirectory of the FAT32 file system but its absolute path is not given. You have to restore the name and the content of the deleted file. For example, if \textit{/dir1/dir2/test3.txt} is deleted by the \textit{rm} command. It should be recovered by your program when your program accepts an input argument \textit{-b} with the deleted file name i.e. \textit{-b test3.txt}. You have to show the absolute path of the recovered file.
+
+In addition, you cannot assume that the file name is unique. If more than one specified file is found, you have to list out all the possible files (not including directories and undeleted files) that can be recovered with their absolute path and let users enter their choice.
+
+Furthermore, if there is no such deleted file, you have to tell the users that no deleted file is found.
+
+Finally, if the file that is going to recover has the same file name with an existing file/directory in the same directory, then you have to ask the user to enter another file name. You can assume that the entered file name satisfies the stated assumptions, but you cannot assume that the file name refers to a non-existing file/directory name.
+
+Here are some assumptions:
+\begin{enumerate}
+  \addtolength{\itemsep}{-4mm}
+    \item The size of the deleted file is not greater than the size of a cluster of the file system.
+    \item The name of the deleted file has at most 8 characters. It has an extension of 1 to 3 characters or has no extension. The file name and the extension only consists of a-z / 0-9.
+    \item The name of a directory has at most 8 characters.
+        The directory name only consists of a-z / 0-9.
+    \item No file/directory creating or modifying (but not limited to file recovering) between the file deletion and the file recovery operations.
+    \item Only files are deleted, not directories.
+\end{enumerate}
+
+~
+
+\noindent \textbf{Sample input and output 1}
+
+Assume that the RAM-Disk \textit{/dev/ram} is formatted as FAT32 and it is mounted to \textit{/mnt/rd}.
+
+~
+
+\begin{tt}
+[root]\# cat /mnt/rd/dir1/dir2/test3.txt
+
+This is test3.txt.
+
+[root]\# rm -f /mnt/rd/dir1/dir2/test3.txt
+
+[root]\# cat /mnt/rd/dir1/dir2/test3.txt
+
+cat: /mnt/rd/dir1/dir2/test3.txt: No such file or directory
+
+[root]\# sync
+
+[root]\# ./Main -b test3.txt
+
+1 deleted \_est3.txt is found
+
+/dir1/dir2/test3.txt is recovered
+
+[root]\# umount /dev/ram
+
+[root]\# mount -t vfat /dev/ram /mnt/rd -o loop
+
+[root]\# cat /mnt/rd/dir1/dir2/test3.txt
+
+This is test3.txt.
+
+[root]\#
+
+\end{tt}
+
+~
+
+\noindent \textbf{Sample input and output 2}
+
+\begin{tt}
+[root]\# cat /mnt/rd/dir1/test4.c
+
+This is the first test4.c and will not be deleted.
+
+[root]\# cat /mnt/rd/dir1/dir2/test4.c
+
+This is the second test4.c and will be deleted.
+
+[root]\# cat /mnt/rd/dir3/dir4/test4.c
+
+This is the third test4.c and will be deleted.
+
+[root]\# rm -f /mnt/rd/dir1/dir2/test4.c
+
+[root]\# rm -f /mnt/rd/dir3/dir4/test4.c
+
+[root]\# sync
+
+[root]\# ./Main -b test4.c
+
+2 deleted \_est4.c are found, please select one of them to recover:
+
+1. /dir1/dir2/\_est4.c
+
+2. /dir3/dir4/\_est4.c
+
+Enter your choice : 1
+
+/dir1/dir2/test4.c is recovered
+
+[root]\# umount /dev/ram
+
+[root]\# mount -t vfat /dev/ram /mnt/rd -o loop
+
+[root]\# cat /mnt/rd/dir1/dir2/test4.c
+
+This is the second test4.c and will be deleted.
+
+[root]\# cat /mnt/rd/dir3/dir4/test4.c
+
+cat: /mnt/rd/dir3/dir4/test4.c: No such file or directory
+
+[root]\# sync
+
+[root]\# ./Main -b test4.c
+
+1 deleted \_est4.c is found
+
+/dir3/dir4/test4.c is recovered
+
+[root]\# umount /dev/ram
+
+[root]\# mount -t vfat /dev/ram /mnt/rd -o loop
+
+[root]\# cat /mnt/rd/dir3/dir4/test4.c
+
+This is the third test4.c and will be deleted.
+
+[root]\#
+
+\end{tt}
+
+~
+
+~\noindent \textbf{Sample input and output 3}
+
+\begin{tt}
+[root]\# locate test5
+
+/mnt/rd/dir1/dir2/test5
+
+[root]\# cat /mnt/rd/dir1/test5
+
+This is the only test5 and will not be deleted.
+
+[root]\# ./Main -b test5
+
+No deleted \_est5 is found
+
+[root]\#
+
+\end{tt}
+
+~
+
+\noindent \textbf{Sample input and output 4}
+
+~
+
+\begin{tt}
+[root]\# cat /mnt/rd/test1.txt
+
+This is test1.txt.
+
+[root]\# cat /mnt/rd/abc.txt
+
+This is abc.txt.
+
+[root]\# cat /mnt/rd/bbc.txt
+
+This is bbc.txt.
+
+[root]\# rm -f /mnt/rd/abc.txt
+
+[root]\# rm -f /mnt/rd/bbc.txt
+
+[root]\# sync
+
+[root]\# ./Main -b bbc.txt
+
+2 deleted \_bc.c are found, please select one of them to recover:
+
+1. /\_bc.c
+
+2. /\_bc.c
+
+Enter your choice : 1
+
+/bbc.c is recovered
+
+[root]\# umount /dev/ram
+
+[root]\# mount -t vfat /dev/ram /mnt/rd -o loop
+
+[root]\# cat /mnt/rd/bbc.txt
+
+This is abc.txt.
+
+[root]\# sync
+
+[root]\# ./Main -b bbc.txt
+
+1 deleted \_bc.c is found:
+
+Recovering /bbc.txt fails due to another file
+/bbc.txt exists. Enter another file name: test1.txt
+
+Recovering /test1.txt fails due to another file
+/test1.txt exists. Enter another file name: test6.txt
+
+/test6.txt is recovered
+
+[root]\# cat /mnt/rd/test6.txt
+
+This is bbc.txt.
+
+[root]\# cat /mnt/rd/abc.txt
+
+cat: /mnt/rd/abc.txt: No such file or directory
+
+[root]\#
+
+\end{tt}
+
+\section*{Submission Guideline}
+
+The bonus part should be implemented on the same source file for the Assignment 3 and they should be submitted together (i.e. no separate submission). The deadline of the bonus part is the same as that of Assignment 3.
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

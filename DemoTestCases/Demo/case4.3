@@ -1,0 +1,65 @@
+umount /mnt/rd
+/sbin/mkfs.vfat -F 32 -f2 -S512 -s1 -R32 /dev/ram
+mount -t vfat /dev/ram /mnt/rd -o loop
+mkdir /mnt/rd/dir3
+mkdir /mnt/rd/dir4
+mkdir /mnt/rd/dir5
+mkdir /mnt/rd/dir6
+mkdir /mnt/rd/dir7
+mkdir /mnt/rd/dir8
+mkdir /mnt/rd/dir9
+cp file4 /mnt/rd/test1.txt
+touch /mnt/rd/test2.txt
+touch /mnt/rd/test3.txt
+touch /mnt/rd/test4.txt
+touch /mnt/rd/test5.txt
+touch /mnt/rd/test6.txt
+touch /mnt/rd/test7.txt
+touch /mnt/rd/test8.txt
+touch /mnt/rd/test9.txt
+mkdir /mnt/rd/dir1
+mkdir /mnt/rd/dir2
+mkdir /mnt/rd/dir1/dir3
+mkdir /mnt/rd/dir1/dir4
+mkdir /mnt/rd/dir1/dir5
+mkdir /mnt/rd/dir1/dir6
+mkdir /mnt/rd/dir1/dir7
+mkdir /mnt/rd/dir1/dir8
+mkdir /mnt/rd/dir1/dir9
+mkdir /mnt/rd/dir1/dir10
+mkdir /mnt/rd/dir1/dir11
+mkdir /mnt/rd/dir1/dir12
+mkdir /mnt/rd/dir1/dir1
+mkdir /mnt/rd/dir1/dir2
+mkdir /mnt/rd/dir2/dir1
+mkdir /mnt/rd/dir2/dir2
+cp file4 /mnt/rd/dir1/test1.txt
+cp file4 /mnt/rd/dir2/test1.txt
+cp file4 /mnt/rd/dir1/dir1/test1.txt
+touch /mnt/rd/dir1/dir2/test0.txt
+touch /mnt/rd/dir1/dir2/test2.txt
+touch /mnt/rd/dir1/dir2/test3.txt
+touch /mnt/rd/dir1/dir2/test4.txt
+touch /mnt/rd/dir1/dir2/test5.txt
+touch /mnt/rd/dir1/dir2/test6.txt
+touch /mnt/rd/dir1/dir2/test7.txt
+touch /mnt/rd/dir1/dir2/test8.txt
+touch /mnt/rd/dir1/dir2/test9.txt
+cp file1 /mnt/rd/dir1/dir2/test1.txt
+cp file4 /mnt/rd/dir2/dir1/test1.txt
+cp file4 /mnt/rd/dir2/dir2/test1.txt
+sync
+rm -f /mnt/rd/test1.txt
+sync
+rm -f /mnt/rd/dir1/test1.txt
+sync
+rm -f /mnt/rd/dir2/test1.txt
+sync
+rm -f /mnt/rd/dir1/dir1/test1.txt
+sync
+rm -f /mnt/rd/dir1/dir2/test1.txt
+sync
+rm -f /mnt/rd/dir2/dir1/test1.txt
+sync
+rm -f /mnt/rd/dir2/dir2/test1.txt
+sync

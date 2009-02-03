@@ -1,0 +1,6 @@
+mkdir /mnt/rd
+umount /mnt/rd
+umount /mnt/rd
+umount /mnt/rd
+umount /mnt/rd
+umount /mnt/rd

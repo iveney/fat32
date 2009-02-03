@@ -1,0 +1,4 @@
+umount /mnt/rd
+/sbin/mkfs.vfat -F 32 -f1 -S1024 -s8 -R64 /dev/ram
+mount -t vfat /dev/ram /mnt/rd -o loop
+sync

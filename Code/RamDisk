@@ -1,0 +1,3 @@
+/sbin/mkfs.vfat -F 32 /dev/ram
+mount -t vfat /dev/ram /mnt/rd -o loop
+df -h | grep ram

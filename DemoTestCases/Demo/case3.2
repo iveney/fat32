@@ -1,0 +1,10 @@
+umount /mnt/rd
+/sbin/mkfs.vfat -F32 -f1 -S4096 -s32 -R11 /dev/ram
+mount -t vfat /dev/ram /mnt/rd -o loop
+mkdir /mnt/rd/dir1
+touch /mnt/rd/test0.txt
+cp file1 /mnt/rd/test1.txt
+touch /mnt/rd/test2.txt
+sync
+rm -f /mnt/rd/test1.txt
+sync

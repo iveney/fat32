@@ -1,0 +1,508 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[dvips]{graphicx, color}
+\usepackage{amsmath,amssymb,verbatim}
+
+\linespread{1.3}
+
+\title{{\bf CSC/CEG 3150 Assignment 3 ~~~~~File Recovery in FAT32}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Background}
+
+In this assignment, you have to implement a C program that recovers a deleted file in FAT32. The suggested platform is Fedora Core 6 (FC6). To create a FAT32 partition in FC6 for this assignment, you should use a RAM-Disk. A RAM-Disk simulates a disk drive so that you don't have to create a real file FAT32 partition on your hard disk. The content in the RAM-Disk disappears when the computer is rebooted.
+
+Two steps to use a FAT32 RAM-Disk:
+
+1. Format a RAM-Disk as FAT32 format (e.g. /dev/ram)
+
+\begin{center}
+/sbin/mkfs.vfat -F 32 /dev/ram
+\end{center}
+
+2. Mount the RAM-Disk to a mount point (e.g. /mnt/rd)
+
+\begin{center}
+mount -t vfat /dev/ram /mnt/rd -o loop
+\end{center}
+
+It is recommended to write a shell script file to execute the above two commands as you may have to execute them many times throughout this assignment. You may use only one RAM-Disk in this assignment, so you can hard code the file system name (i.e. \textit{/dev/ram}) into your program instead of reading it from the input argument.
+
+After you have created and mounted a RAM-Disk, you can see its status by using the \textit{df} command.
+
+The RAM-Disk can be operated by normal file operation commands on \textit{/mnt/rd}. For example, if you copy a file, say \textit{abc.txt}, into \textit{/mnt/rd}, the result is copying the \textit{abc.txt} file to the root directory of the RAM-Disk. Of course, you can freely create files or directories in \textit{/mnt/rd}.
+
+You can unmount the RAM-Disk by the following command:
+\begin{center}
+umount /mnt/rd
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Milestone 1 - Print the information about the file system (10\%)}
+
+In this part, you need to print the following information about the FAT32 file system when your program accepts an input argument \textit{-i}.
+
+\begin{enumerate}
+  \addtolength{\itemsep}{-4mm}
+    \item Number of FATs
+    \item Number of bytes per sector
+    \item Number of sectors per cluster
+    \item Number of reserved sectors
+\end{enumerate}
+
+The above information varies if different arguments are provided for the \textit{mkfs.vfat} command when you are formatting the FAT32 file system. E.g.
+
+\begin{center}
+/sbin/mkfs.vfat -F 32 -f 2 -S 512 -s 1 -R 32 /dev/ram
+\end{center}
+
+For more details, please refer to the man page of \textit{mkfs.vfat} or \textit{mkdosfs}. You cannot assume any sizes about the cluster size, the number of FATs, etc. You have to read the values from the boot sector.
+
+~
+
+\noindent \textbf{Sample input and output}
+
+Assume that the RAM-Disk \textit{/dev/ram} is formatted as FAT32 by the above command and \textit{Main} is the executable of your program.
+
+~
+
+\begin{tt}
+
+[root]\# ./Main -i
+
+Number of FATs = 2
+
+Number of bytes per sector = 512
+
+Number of sectors per cluster = 1
+
+Number of reserved sectors = 32
+
+[root]\#
+
+\end{tt}
+
+~
+
+\section*{Milestone 2 - List out the files and directories in the root directory (20\%)}
+
+In this part, you need to list out all the file and directory in the root directory of the FAT32 file system when your program accepts an input argument \textit{-l}. The output format is stated as follows:
+
+\begin{enumerate}
+    \item You have to distinguish between files and directories by adding a '+' character at the end of a file name and a '/' character at the end of a directory name.
+    \item In the output, each line should list only one file/directory. If there are 3 files/directories in the root directory, then there are 3 lines in your output.
+    \item The listing order is not important.
+\end{enumerate}
+
+\noindent \textbf{Sample input and output}
+
+Assume that the root directory of \textit{/dev/ram} contains two files (\textit{abc.txt} and \textit{test1.txt}) and one directory (\textit{dir1}).
+
+~
+
+\begin{tt}
+
+[root]\# ./Main -l
+
+abc.txt+
+
+dir1/
+
+test1.txt+
+
+[root]\#
+
+\end{tt}
+
+~
+
+Here are some assumptions:
+\begin{enumerate}
+    \item The name of a file has at most 8 characters
+        and there must be an extension with exactly 3
+        characters. The file name and the extension only consists of a-z / 0-9.
+    \item The name of a directory has at most 8 characters.
+        The directory name only consists of a-z / 0-9.
+\end{enumerate}
+
+
+\section*{Milestone 3 - Recover a deleted file in the root directory (30\%)}
+
+In this part, you need to recover a deleted file in the root directory of the FAT32 file system. You have to restore the directory entry and the content of the deleted file. For example, if \textit{test1.txt} in the root directory is deleted by the \textit{rm} command. It should be recovered by your program when your program accepts an input argument \textit{-r} with the deleted file name, i.e. \textit{-r test1.txt}.
+
+Here are some assumptions:
+\begin{enumerate}
+  \addtolength{\itemsep}{-4mm}
+    \item The size of the deleted file is not greater than the size of a cluster of the file system.
+    \item The file name supplied by the user must be valid, i.e. it must refer to a deleted file with a correct name.
+    \item The name of the deleted file has at most 8 characters and there must be an extension with exactly 3 characters. The file name and the extension only consists of a-z  / 0-9.
+    \item No file/directory creating or modifying (but not limited to file recovering) between the file deletion and the file recovery operations.
+\end{enumerate}
+
+~
+
+\noindent \textbf{Sample input and output}
+
+Assume that the RAM-Disk \textit{/dev/ram} is formatted as FAT32 and it is mounted to \textit{/mnt/rd}.
+
+~
+
+\begin{tt}
+[root]\# cat /mnt/rd/test1.txt
+
+This is test1.txt.
+
+[root]\# rm -f /mnt/rd/test1.txt
+
+[root]\# cat /mnt/rd/test1.txt
+
+cat: /mnt/rd/test1.txt: No such file or directory
+
+[root]\# sync
+
+[root]\# ./Main -r test1.txt
+
+[root]\# umount /dev/ram
+
+[root]\# mount -t vfat /dev/ram /mnt/rd -o loop
+
+[root]\# cat /mnt/rd/test1.txt
+
+This is test1.txt.
+
+[root]\#
+
+\end{tt}
+
+~
+
+When your program accepts an argument "\textit{-r $<$filename$>$}", it recovers the specified file in the root directory of \textit{/dev/ram}. For the reason of having \textit{sync}, \textit{umount}, and \textit{mount} commands before/after the execution of your program, please refer to the \textbf{Suggestions} section.
+
+\section*{Milestone 4 - Recover a deleted file in a subdirectory (40\%)}
+
+In this part, you need to recover a deleted file in a subdirectory of the FAT32 file system. You have to restore the directory entry and the content of the deleted file. For example, if \textit{/dir1/dir2/test2.txt} is deleted by the \textit{rm} command. It should be recovered by your program when your program accepts an input argument \textit{-d} with the deleted file name with  \textit{absolute path} corresponds to the FAT32 file system, i.e. \textit{-d /dir1/dir2/test2.txt}.
+
+Here are some assumptions:
+\begin{enumerate}
+  \addtolength{\itemsep}{-4mm}
+    \item The size of the deleted file is not greater than the size of a cluster of the file system.
+    \item The file name and the absolute path supplied by the user must be valid, i.e. they must refer to a deleted file with a correct absolute path and name.
+    \item The name of the deleted file has at most 8 characters
+        and there must be an extension with exactly 3
+        characters. The file name and the extension only consists of a-z / 0-9.
+    \item The name of a directory has at most 8 characters.
+        The directory name only consists of a-z / 0-9.
+    \item No file/directory creating or modifying (but not limited to file recovering) between the file deletion and the file recovery operations.
+    \item Only files are deleted, not directories.
+\end{enumerate}
+
+~
+
+\noindent \textbf{Sample input and output}
+
+Assume that the RAM-Disk \textit{/dev/ram} is formatted as FAT32 and it is mounted to \textit{/mnt/rd}.
+
+~
+
+\begin{tt}
+[root]\# cat /mnt/rd/dir1/dir2/test2.txt
+
+This is test2.txt.
+
+[root]\# rm -f /mnt/rd/dir1/dir2/test2.txt
+
+[root]\# cat /mnt/rd/dir1/dir2/test2.txt
+
+cat: /mnt/rd/dir1/dir2/test2.txt: No such file or directory
+
+[root]\# sync
+
+[root]\# ./Main -d /dir1/dir2/test2.txt
+
+[root]\# umount /dev/ram
+
+[root]\# mount -t vfat /dev/ram /mnt/rd -o loop
+
+[root]\# cat /mnt/rd/dir1/dir2/test2.txt
+
+This is test2.txt.
+
+[root]\#
+
+\end{tt}
+
+~
+
+When your program accepts an argument "\textit{-d $<$filename with absolute path$>$}", it recovers the specified file in the specified subdirectory of \textit{/dev/ram}. Note that the absolute path corresponds to \textit{/dev/ram}, but not FC6. That means it is \textit{/dir1/dir2/test2.txt} instead of \textit{/mnt/rd/dir1/dir2/test2.txt}.
+
+\section*{Suggestions}
+
+After you have made some changes to the file system, such as creating a file or deleting a file, you may find that the file system read by your program is not updated. It is because the kernel keeps data in memory instead of updating the data on disk in order to avoid doing relatively slow disk reads and writes. To solve this problem, you can use the \textit{sync} command, which writes any data buffered in memory out to disk. You can either use the \textit{sync} command before the execution of your program or call sync() inside your program.
+
+Even if your program is correct, after it has recovered a deleted file, sometimes you still cannot find the file. To solve this problem, you can remount the RAM-Disk, i.e. unmount and then mount again (you may want to write a script file to do these), then you can find the recovered file.
+
+\section*{Submission Guideline}
+
+For the submission of the assignment, please refer to the following
+link:
+\begin{center}
+{\bf http://www.cse.cuhk.edu.hk/\~{}csc3150/submission/}
+\end{center}
+
+\noindent {\bf Due date: 23:59, December 2, 2007.}
+
+\section*{Bonus Part - To be released ...}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
